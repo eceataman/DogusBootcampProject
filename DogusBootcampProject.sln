@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35222.181
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DogusBootcampProject", "DogusBootcampProject\DogusBootcampProject.csproj", "{90B034BA-D6F8-440A-9C6F-88AA53C8C35F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{90B034BA-D6F8-440A-9C6F-88AA53C8C35F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90B034BA-D6F8-440A-9C6F-88AA53C8C35F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90B034BA-D6F8-440A-9C6F-88AA53C8C35F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90B034BA-D6F8-440A-9C6F-88AA53C8C35F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {643B9C04-BB1B-4A70-8047-1565B8B17CB8}
+	EndGlobalSection
+EndGlobal
