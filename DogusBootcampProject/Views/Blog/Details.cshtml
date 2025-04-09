@@ -1,0 +1,23 @@
+﻿@model DogusBootcampProject.Models.Blog
+@{
+    ViewData["Title"] = "Blog Detayı";
+}
+
+<h2>@Model.Title</h2>
+
+<p class="text-muted">
+    Kategori: <strong>@Model.Category?.Name</strong> |
+    Yazar: <strong>@Model.User?.UserName</strong> |
+    Tarih: <strong>@Model.PublishDate.ToShortDateString()</strong>
+</p>
+
+@if (!string.IsNullOrEmpty(Model.ImageUrl))
+{
+    <div class="mb-3">
+        <img src="@Model.ImageUrl" alt="Blog Görseli" class="img-fluid rounded shadow" style="max-width: 600px;" />
+    </div>
+}
+
+<p>@Model.Content</p>
+
+<a asp-action="Index" class="btn btn-secondary mt-3">Geri Dön</a>

@@ -1,0 +1,43 @@
+﻿@model IEnumerable<DogusBootcampProject.Models.Blog>
+@{
+    ViewData["Title"] = "Bloglar";
+}
+
+<h2>Blog Listesi</h2>
+
+@if (User.Identity.IsAuthenticated)
+{
+    <a class="btn btn-primary mb-3" asp-controller="Blog" asp-action="Create">Yeni Blog Ekle</a>
+}
+
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>Başlık</th>
+            <th>Yazar</th>
+            <th>Kategori</th>
+            <th>Tarih</th>
+            <th>İşlemler</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var blog in Model)
+        {
+            <tr>
+                <td>@blog.Title</td>
+                <td>@blog.User?.UserName</td>
+                <td>@blog.Category?.Name</td>
+                <td>@blog.PublishDate.ToShortDateString()</td>
+                <td>
+                    <a class="btn btn-sm btn-info" asp-action="Details" asp-route-id="@blog.Id">Detay</a>
+
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <a class="btn btn-sm btn-warning" asp-action="Edit" asp-route-id="@blog.Id">Düzenle</a>
+                        <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@blog.Id">Sil</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

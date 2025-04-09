@@ -1,0 +1,17 @@
+﻿@model DogusBootcampProject.ViewModels.LoginViewModel
+@{
+    ViewData["Title"] = "Giriş Yap";
+}
+
+<h2>Giriş Yap</h2>
+<form asp-action="Login" method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <label>Kullanıcı Adı</label>
+    <input asp-for="UserName" class="form-control" />
+
+    <label>Şifre</label>
+    <input asp-for="Password" class="form-control" type="password" />
+
+    <button type="submit" class="btn btn-success mt-3">Giriş Yap</button>
+</form>
