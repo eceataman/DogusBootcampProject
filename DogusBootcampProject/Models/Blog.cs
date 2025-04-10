@@ -22,6 +22,8 @@ namespace DogusBootcampProject.Models
         public int CategoryId { get; set; }
         public Category Category { get; set; }
 
-        public string ImageUrl { get; set; } // required değil!
+        public string? ImageUrl { get; set; } // required değil!
+        public ICollection<Comment> Comments { get; set; }
+
     }
 }

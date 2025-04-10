@@ -14,5 +14,5 @@ public class BlogEditViewModel
     [Required(ErrorMessage = "Kategori seçilmelidir.")]
     public int CategoryId { get; set; }
 
-    public string ImageUrl { get; set; } // Görsel zorunlu değil düzenleme için
+    public string? ImageUrl { get; set; } // Görsel zorunlu değil düzenleme için
 }

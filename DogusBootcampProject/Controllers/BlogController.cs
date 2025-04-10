@@ -1,9 +1,11 @@
-﻿using DogusBootcampProject.Models;
+﻿using DogusBootcampProject.Data;
+using DogusBootcampProject.Models;
 using DogusBootcampProject.Repositories;
 using DogusBootcampProject.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace DogusBootcampProject.Controllers
 {
@@ -12,12 +14,18 @@ namespace DogusBootcampProject.Controllers
         private readonly IBlogRepository _blogRepository;
         private readonly IRepository<Category> _categoryRepository;
         private readonly UserManager<User> _userManager;
+        private readonly BlogDbContext _context;
 
-        public BlogController(IBlogRepository blogRepository, IRepository<Category> categoryRepository, UserManager<User> userManager)
+        public BlogController(
+            IBlogRepository blogRepository,
+            IRepository<Category> categoryRepository,
+            UserManager<User> userManager,
+            BlogDbContext context)
         {
             _blogRepository = blogRepository;
             _categoryRepository = categoryRepository;
             _userManager = userManager;
+            _context = context;
         }
 
         [AllowAnonymous]
@@ -30,7 +38,13 @@ namespace DogusBootcampProject.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Details(int id)
         {
-            var blog = await _blogRepository.GetByIdAsync(id);
+            var blog = await _context.Blogs
+                .Include(b => b.User)
+                .Include(b => b.Category)
+                .Include(b => b.Comments)
+                    .ThenInclude(c => c.User)
+                .FirstOrDefaultAsync(b => b.Id == id);
+
             if (blog == null) return NotFound();
             return View(blog);
         }
@@ -85,8 +99,6 @@ namespace DogusBootcampProject.Controllers
             return RedirectToAction("Index");
         }
 
-
-
         [Authorize]
         public async Task<IActionResult> Edit(int id)
         {
@@ -106,10 +118,9 @@ namespace DogusBootcampProject.Controllers
             return View(model);
         }
 
-
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> Edit(BlogEditViewModel model)
+        public async Task<IActionResult> Edit(BlogEditViewModel model, IFormFile imageFile)
         {
             if (!ModelState.IsValid)
             {
@@ -123,15 +134,36 @@ namespace DogusBootcampProject.Controllers
             blog.Title = model.Title;
             blog.Content = model.Content;
             blog.CategoryId = model.CategoryId;
-            blog.ImageUrl = model.ImageUrl;
+
+            if (imageFile != null && imageFile.Length > 0)
+            {
+                if (!string.IsNullOrEmpty(blog.ImageUrl))
+                {
+                    var oldImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", blog.ImageUrl.TrimStart('/'));
+                    if (System.IO.File.Exists(oldImagePath))
+                    {
+                        System.IO.File.Delete(oldImagePath);
+                    }
+                }
+
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
+                Directory.CreateDirectory(uploadsFolder);
+                var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await imageFile.CopyToAsync(stream);
+                }
+
+                blog.ImageUrl = "/uploads/" + uniqueFileName;
+            }
 
             _blogRepository.Update(blog);
             await _blogRepository.SaveAsync();
 
             return RedirectToAction("Index");
         }
-
-
 
         [Authorize]
         public async Task<IActionResult> Delete(int id)

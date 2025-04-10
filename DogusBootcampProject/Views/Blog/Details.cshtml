@@ -21,3 +21,41 @@
 <p>@Model.Content</p>
 
 <a asp-action="Index" class="btn btn-secondary mt-3">Geri Dön</a>
+
+<hr />
+
+<!-- Yorum Formu -->
+@if (User.Identity.IsAuthenticated)
+{
+    <form asp-controller="Comment" asp-action="Add" method="post">
+        <input type="hidden" name="BlogId" value="@Model.Id" />
+        <div class="form-group">
+            <label>Yorumunuz</label>
+            <textarea name="Content" class="form-control" rows="3" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary mt-2">Yorum Yap</button>
+    </form>
+}
+else
+{
+    <p><a asp-controller="Account" asp-action="Login">Giriş yap</a> yaparak yorum yazabilirsiniz.</p>
+}
+
+<hr />
+
+<!-- Yorumlar Listesi -->
+<h5>Yorumlar</h5>
+@if (Model.Comments != null && Model.Comments.Any())
+{
+    @foreach (var comment in Model.Comments.OrderByDescending(c => c.CreatedAt))
+    {
+        <div class="mb-2 border p-2 rounded bg-light">
+            <strong>@comment.User?.UserName</strong> - @comment.CreatedAt.ToShortDateString()
+            <p>@comment.Content</p>
+        </div>
+    }
+}
+else
+{
+    <p>Henüz yorum yapılmamış.</p>
+}
