@@ -57,12 +57,13 @@ namespace DogusBootcampProject.Controllers
 			ModelState.AddModelError("", "Geçersiz kullanıcı adı veya şifre.");
 			return View(model);
 		}
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Index", "Home");
+        }
 
-		// GET: /Account/Logout
-		public async Task<IActionResult> Logout()
-		{
-			await _signInManager.SignOutAsync();
-			return RedirectToAction("Index", "Home");
-		}
-	}
+    }
 }
