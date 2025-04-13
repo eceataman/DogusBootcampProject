@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-
+namespace DogusBootcampProject.ViewModels;
 public class ForgotPasswordViewModel
 {
     [Required]

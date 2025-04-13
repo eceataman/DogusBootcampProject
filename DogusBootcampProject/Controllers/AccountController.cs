@@ -70,15 +70,20 @@ namespace DogusBootcampProject.Controllers
 
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
-                return RedirectToAction("ForgotPasswordConfirmation");
+            {
+                TempData["Error"] = "Bu e-posta ile kayıtlı kullanıcı bulunamadı.";
+                return View(model);
+            }
 
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
             var link = Url.Action("ResetPassword", "Account", new { token, email = model.Email }, Request.Scheme);
 
             await _emailSender.SendEmailAsync(model.Email, "Şifre Sıfırlama", $"<a href='{link}'>Şifrenizi sıfırlamak için tıklayın</a>");
 
-            return RedirectToAction("ForgotPasswordConfirmation");
+            TempData["Success"] = "Şifre sıfırlama bağlantısı mail adresinize gönderildi.";
+            return RedirectToAction("ForgotPassword");
         }
+
 
         public IActionResult ForgotPasswordConfirmation() => View();
 
