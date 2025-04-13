@@ -1,0 +1,39 @@
+﻿@{
+    ViewData["Title"] = "Sohbet Paneli";
+}
+
+<h2 class="mb-3">Canlı Mesajlar</h2>
+
+<div class="border p-3 rounded bg-white" style="height: 400px; overflow-y: scroll;" id="adminChatBox">
+</div>
+
+<div class="input-group mt-3">
+    <input type="text" class="form-control" placeholder="Mesaj yaz..." id="adminMessageInput" />
+    <button class="btn btn-primary" id="adminSendBtn">Gönder</button>
+</div>
+
+@section Scripts {
+    <script src="~/js/signalr/signalr.js"></script>
+    <script>
+        const adminConnection = new signalR.HubConnectionBuilder()
+            .withUrl("/chathub")
+            .build();
+
+        adminConnection.start().catch(err => console.error(err.toString()));
+
+        adminConnection.on("ReceiveMessage", function (user, message) {
+            const msg = `<div><strong>${user}</strong>: ${message}</div>`;
+            const chatBox = document.getElementById("adminChatBox");
+            chatBox.innerHTML += msg;
+            chatBox.scrollTop = chatBox.scrollHeight;
+        });
+
+        document.getElementById("adminSendBtn").addEventListener("click", function () {
+            const message = document.getElementById("adminMessageInput").value;
+            if (message.trim() === "") return;
+
+            adminConnection.invoke("SendMessage", "Admin", message).catch(err => console.error(err.toString()));
+            document.getElementById("adminMessageInput").value = "";
+        });
+    </script>
+}
