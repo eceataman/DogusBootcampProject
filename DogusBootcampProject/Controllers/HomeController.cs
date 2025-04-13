@@ -16,20 +16,36 @@ namespace DogusBootcampProject.Controllers
             _blogRepository = blogRepository;
             _categoryRepository = categoryRepository;
         }
-
-        public async Task<IActionResult> Index(int? categoryId)
+        public async Task<IActionResult> Index()
         {
+            var blogs = await _blogRepository.GetAllWithUserAndCategoryAsync();
+            ViewBag.Categories = await _categoryRepository.GetAllAsync(); // bu sayede ViewBag.Categories dolacak
+            return View(blogs);
+        }
+
+        public async Task<IActionResult> Search(int? categoryId, string? search)
+        {
+            var blogs = await _blogRepository.GetAllWithUserAndCategoryAsync();
             ViewBag.Categories = await _categoryRepository.GetAllAsync();
 
-            var blogs = await _blogRepository.GetAllWithUserAndCategoryAsync();
+
 
             if (categoryId.HasValue)
             {
                 blogs = blogs.Where(b => b.CategoryId == categoryId.Value).ToList();
             }
 
-            return View(blogs);
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                blogs = blogs.Where(b =>
+                    b.Title.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                    b.Content.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+
+            return PartialView("_BlogResults", blogs); // Burasý aþaðýda geliyor ??
         }
+
+
 
         public IActionResult Privacy()
 		{

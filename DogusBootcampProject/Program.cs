@@ -3,7 +3,8 @@ using DogusBootcampProject.Models;
 using DogusBootcampProject.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using DogusBootcampProject.Hubs; // ?? ChatHub için eklenen using
+using DogusBootcampProject.Hubs;
+using Microsoft.AspNetCore.Identity.UI.Services; // ?? ChatHub için eklenen using
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,8 @@ builder.Services.AddIdentity<User, IdentityRole<int>>()
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IBlogRepository, BlogRepository>();
+builder.Services.AddTransient<IEmailSender, EmailSender>();
+
 
 // ?? SignalR servisini ekle
 builder.Services.AddSignalR();

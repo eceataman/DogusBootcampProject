@@ -1,4 +1,5 @@
 ﻿@model DogusBootcampProject.ViewModels.LoginViewModel
+
 @{
     ViewData["Title"] = "Giriş Yap";
 }
@@ -14,4 +15,8 @@
     <input asp-for="Password" class="form-control" type="password" />
 
     <button type="submit" class="btn btn-success mt-3">Giriş Yap</button>
+
+    <div class="mt-2">
+        <a asp-action="ForgotPassword" asp-controller="Account">Şifremi Unuttum</a>
+    </div>
 </form>

@@ -1,6 +1,7 @@
 ﻿using DogusBootcampProject.Models;
 using DogusBootcampProject.ViewModels;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DogusBootcampProject.Controllers
@@ -9,11 +10,13 @@ namespace DogusBootcampProject.Controllers
 	{
 		private readonly UserManager<User> _userManager;
 		private readonly SignInManager<User> _signInManager;
+        private readonly IEmailSender _emailSender;
 
-		public AccountController(UserManager<User> userManager, SignInManager<User> signInManager)
+        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager,IEmailSender emailSender)
 		{
 			_userManager = userManager;
 			_signInManager = signInManager;
+			_emailSender = emailSender;
 		}
 
 		// GET: /Account/Register
@@ -57,6 +60,28 @@ namespace DogusBootcampProject.Controllers
 			ModelState.AddModelError("", "Geçersiz kullanıcı adı veya şifre.");
 			return View(model);
 		}
+        [HttpGet]
+        public IActionResult ForgotPassword() => View();
+
+        [HttpPost]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+                return RedirectToAction("ForgotPasswordConfirmation");
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var link = Url.Action("ResetPassword", "Account", new { token, email = model.Email }, Request.Scheme);
+
+            await _emailSender.SendEmailAsync(model.Email, "Şifre Sıfırlama", $"<a href='{link}'>Şifrenizi sıfırlamak için tıklayın</a>");
+
+            return RedirectToAction("ForgotPasswordConfirmation");
+        }
+
+        public IActionResult ForgotPasswordConfirmation() => View();
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
@@ -64,6 +89,32 @@ namespace DogusBootcampProject.Controllers
             await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
         }
+
+        [HttpGet]
+        public IActionResult ResetPassword(string token, string email) =>
+    View(new ResetPasswordViewModel { Token = token, Email = email });
+
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+                return RedirectToAction("ResetPasswordConfirmation");
+
+            var result = await _userManager.ResetPasswordAsync(user, model.Token, model.Password);
+
+            if (result.Succeeded)
+                return RedirectToAction("ResetPasswordConfirmation");
+
+            foreach (var error in result.Errors)
+                ModelState.AddModelError("", error.Description);
+
+            return View(model);
+        }
+
+        public IActionResult ResetPasswordConfirmation() => View();
 
     }
 }

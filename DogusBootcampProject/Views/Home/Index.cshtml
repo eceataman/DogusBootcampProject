@@ -1,50 +1,58 @@
 ﻿@model List<DogusBootcampProject.Models.Blog>
 @{
     ViewData["Title"] = "Anasayfa";
-    var categories = ViewBag.Categories as List<DogusBootcampProject.Models.Category>;
-    var selectedCategoryId = Context.Request.Query["categoryId"].ToString();
+    var categories = ViewBag.Categories as List<DogusBootcampProject.Models.Category>; // 🔥 BU SATIR ZORUNLU
 }
 
-<h2 class="mb-4">Blog Yazıları</h2>
 
-<!-- Kategori Filtreleme -->
+<!-- 🔍 AJAX Arama + Kategori -->
 <div class="mb-4">
-    <form method="get" asp-action="Index" class="row g-2">
+    <div class="row g-2">
         <div class="col-md-4">
-            <select name="categoryId" class="form-select" onchange="this.form.submit()">
+            <select id="categorySelect" class="form-select">
                 <option value="">Tüm Kategoriler</option>
                 @foreach (var category in categories)
                 {
-                    <option value="@category.Id" selected="@(selectedCategoryId == category.Id.ToString() ? "selected" : null)">
-                        @category.Name
-                    </option>
+                    <option value="@category.Id">@category.Name</option>
                 }
             </select>
         </div>
-    </form>
+        <div class="col-md-6">
+            <input type="text" id="searchInput" class="form-control" placeholder="Blog başlığı veya içerikte ara..." />
+        </div>
+    </div>
 </div>
 
-<!-- Blog Kartları -->
-<div class="row">
+<!-- 🔽 Bloglar buraya yüklenecek -->
+<div class="row" id="blogContainer">
     @foreach (var blog in Model)
     {
-        <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                @if (!string.IsNullOrEmpty(blog.ImageUrl))
-                {
-                    <img src="@blog.ImageUrl" class="card-img-top" style="height:200px; object-fit:cover;" alt="Görsel" />
-                }
-                <div class="card-body">
-                    <h5 class="card-title">@blog.Title</h5>
-                    <p class="card-text text-muted">
-                        Kategori: @blog.Category?.Name<br />
-                        Yazar: @blog.User?.UserName<br />
-                        Tarih: @blog.PublishDate.ToShortDateString()
-                    </p>
-                    <a asp-controller="Blog" asp-action="Details" asp-route-id="@blog.Id" class="btn btn-outline-primary">Devamını Oku</a>
-                </div>
-            </div>
-        </div>
-    }
+        <partial name="_BlogCard" model="blog" />
     }
 </div>
+
+@section Scripts {
+    <script>
+        function fetchBlogs() {
+            const categoryId = $('#categorySelect').val();
+            const search = $('#searchInput').val();
+
+            $.ajax({
+                url: '@Url.Action("Search", "Home")',
+                type: 'GET',
+                data: { categoryId, search },
+                success: function (html) {
+                    $('#blogContainer').html(html);
+                }
+            });
+        }
+
+        $('#searchInput').on('input', function () {
+            fetchBlogs();
+        });
+
+        $('#categorySelect').on('change', function () {
+            fetchBlogs();
+        });
+    </script>
+}

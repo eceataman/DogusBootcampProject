@@ -1,0 +1,19 @@
+﻿@model DogusBootcampProject.Models.Blog
+
+<div class="col-md-4 mb-4">
+    <div class="card h-100">
+        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+        {
+            <img src="@Model.ImageUrl" class="card-img-top" style="height:200px; object-fit:cover;" alt="Görsel" />
+        }
+        <div class="card-body">
+            <h5 class="card-title">@Model.Title</h5>
+            <p class="card-text text-muted">
+                Kategori: @Model.Category?.Name<br />
+                Yazar: @Model.User?.UserName<br />
+                Tarih: @Model.PublishDate.ToShortDateString()
+            </p>
+            <a asp-controller="Blog" asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-primary">Devamını Oku</a>
+        </div>
+    </div>
+</div>

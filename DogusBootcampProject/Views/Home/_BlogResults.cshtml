@@ -1,0 +1,6 @@
+﻿@model List<DogusBootcampProject.Models.Blog>
+
+@foreach (var blog in Model)
+{
+    <partial name="_BlogCard" model="blog" />
+}
