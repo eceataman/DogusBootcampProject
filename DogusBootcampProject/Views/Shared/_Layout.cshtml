@@ -38,12 +38,7 @@
                                 <a class="nav-link disabled">Hoş geldin, @User.Identity.Name</a>
                             </li>
 
-                            @if (User.IsInRole("Admin"))
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Admin" asp-action="Chat">Sohbet Paneli</a>
-                                </li>
-                            }
+                         
 
                             <li class="nav-item">
                                 <form asp-controller="Account" asp-action="Logout" method="post">

@@ -3,7 +3,6 @@ using DogusBootcampProject.Models;
 using DogusBootcampProject.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using DogusBootcampProject.Hubs;
 using Microsoft.AspNetCore.Identity.UI.Services; // ?? ChatHub için eklenen using
 
 var builder = WebApplication.CreateBuilder(args);
@@ -76,8 +75,5 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-
-// ?? SignalR Hub rotasý (en sonda)
-app.MapHub<ChatHub>("/chathub");
 
 app.Run();

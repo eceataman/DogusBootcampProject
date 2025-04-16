@@ -21,6 +21,7 @@ namespace DogusBootcampProject.Models
         [Required(ErrorMessage = "Kategori seçmelisiniz.")]
         public int CategoryId { get; set; }
         public Category Category { get; set; }
+      
 
         public string? ImageUrl { get; set; } // required değil!
         public ICollection<Comment> Comments { get; set; }

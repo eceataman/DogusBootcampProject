@@ -25,7 +25,7 @@
 <hr />
 
 <!-- Yorum Formu -->
-@if (User.Identity.IsAuthenticated)
+@if (User.Identity.IsAuthenticated && !User.IsInRole("Admin"))
 {
     <form asp-controller="Comment" asp-action="Add" method="post">
         <input type="hidden" name="BlogId" value="@Model.Id" />
@@ -36,7 +36,7 @@
         <button type="submit" class="btn btn-primary mt-2">Yorum Yap</button>
     </form>
 }
-else
+else if (!User.Identity.IsAuthenticated)
 {
     <p><a asp-controller="Account" asp-action="Login">Giriş yap</a> yaparak yorum yazabilirsiniz.</p>
 }
@@ -47,11 +47,39 @@ else
 <h5>Yorumlar</h5>
 @if (Model.Comments != null && Model.Comments.Any())
 {
-    @foreach (var comment in Model.Comments.OrderByDescending(c => c.CreatedAt))
+    @foreach (var comment in Model.Comments
+          .Where(c => c.ParentCommentId == null)
+          .OrderByDescending(c => c.CreatedAt))
     {
-        <div class="mb-2 border p-2 rounded bg-light">
+        <div class="mb-3 p-3 border rounded bg-light">
             <strong>@comment.User?.UserName</strong> - @comment.CreatedAt.ToShortDateString()
             <p>@comment.Content</p>
+
+            <!-- Alt Yorumlar (Admin cevapları) -->
+            @if (comment.Replies != null && comment.Replies.Any())
+            {
+                foreach (var reply in comment.Replies.OrderBy(r => r.CreatedAt))
+                {
+                    <div class="ms-4 mt-2 p-2 border-start border-2">
+                        <strong class="text-primary">@reply.User?.UserName (Yanıtladı)</strong>
+                        <div>@reply.Content</div>
+                        <small class="text-muted">@reply.CreatedAt.ToShortDateString()</small>
+                    </div>
+                }
+            }
+
+            <!-- Yorumlara Admin Cevabı -->
+            @if (User.IsInRole("Admin"))
+            {
+                <form asp-controller="Comment" asp-action="ReplyToComment" method="post" class="mt-2 ms-4">
+                    <input type="hidden" name="ParentCommentId" value="@comment.Id" />
+                    <input type="hidden" name="BlogId" value="@Model.Id" />
+                    <div class="form-group">
+                        <textarea name="ReplyContent" class="form-control form-control-sm" rows="2" placeholder="Cevabınız..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-outline-secondary mt-1">Yanıtla</button>
+                </form>
+            }
         </div>
     }
 }

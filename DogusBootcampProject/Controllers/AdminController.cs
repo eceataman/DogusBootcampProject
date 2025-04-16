@@ -6,9 +6,6 @@ namespace DogusBootcampProject.Controllers
     [Authorize(Roles = "Admin")]
     public class AdminController : Controller
     {
-        public IActionResult Chat()
-        {
-            return View();
-        }
+
     }
 }
